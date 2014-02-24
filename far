@@ -1,0 +1,44 @@
+#!/usr/bin/env ruby
+#
+# Super simple ruby script that can make it easier to run a command line
+# recursive find/replace on a directory.  Because I was fed up of googling
+# the relevant grep/sed command
+
+require 'getoptlong'
+
+opts = GetoptLong.new(
+  [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+  [ '--version', '-v', GetoptLong::NO_ARGUMENT ],
+  [ '--find', '-f', GetoptLong::REQUIRED_ARGUMENT ],
+  [ '--replace', '-r', GetoptLong::REQUIRED_ARGUMENT ]
+)
+
+find = ''
+replace = ''
+
+opts.each do |opt, arg|
+	case opt
+		when '--help'
+			abort 'Example usage: \'far --find foo --replace bar\''
+		when '--version'
+			abort 'Find and Replace version 1.0'
+		when '--find'
+			find = arg
+		when '--replace'
+			replace = arg
+	end
+end
+
+if (find == '' || replace == '') 
+	puts "You didn't specify both a --find value and a --replace value"
+else
+	puts "Finding #{find}, replacing with #{replace}"
+
+	Dir['**/*'].each do |path|
+		if File.file? path
+			puts "Processing file #{path}"
+			text = File.read(path).gsub(find, replace)
+			File.open(path, "w").write(text)
+		end
+	end
+end
