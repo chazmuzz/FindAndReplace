@@ -29,16 +29,20 @@ opts.each do |opt, arg|
 	end
 end
 
-if (find == '' || replace == '') 
+if (find == '') 
 	puts "You didn't specify both a --find value and a --replace value"
 else
 	puts "Finding #{find}, replacing with #{replace}"
 
 	Dir['**/*'].each do |path|
-		if File.file? path
+		if File.file?(path) and !File.binary?(path)
 			puts "Processing file #{path}"
-			text = File.read(path).gsub(find, replace)
-			File.open(path, "w").write(text)
+			begin
+				text = File.read(path).gsub(find, replace)
+				File.open(path, "w").write(text)
+			rescue
+				puts "Not a text file"
+			end
 		end
 	end
 end
